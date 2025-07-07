@@ -1,0 +1,54 @@
+{
+  "name": "Конвертер стилів форматування",
+  "short_name": "Конвертер стилів",
+  "description": "Конвертер стилів форматування бібліографічних посилань: ДСТУ 8302:2015, APA, IEEE.",
+  "start_url": "/?source=pwa",
+  "id": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay"],
+  "background_color": "#f0f0f0",
+  "theme_color": "#2196F3",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-narrow.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "screenshot-wide.png",
+      "sizes": "720x540",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "orientation": "any",
+  "lang": "uk",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "categories": ["utilities", "education", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Новий запис",
+      "short_name": "Новий",
+      "description": "Створити новий бібліографічний запис",
+      "url": "/?action=new",
+      "icons": [{ "src": "icon-96x96.png", "sizes": "96x96" }]
+    }
+  ]
+} 

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Конвертер стилів форматування бібліографічних посилань: ДСТУ 8302:2015, APA, IEEE.">
+    <meta name="theme-color" content="#2196F3" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0D47A1" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Конвертер стилів">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Конвертер стилів">
+    
+    <!-- PWA assets -->
+    <link rel="manifest" href="app.webmanifest">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    
+    <!-- Preconnect to required domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <title>Конвертер стилів форматування</title>
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('./service-worker.js');
+                    console.log('Service Worker registered with scope:', registration.scope);
+                    
+                    // Check for service worker updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // New service worker available
+                                if (confirm('Доступна нова версія додатку. Оновити зараз?')) {
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                    window.location.reload();
+                                }
+                            }
+                        });
+                    });
+                    
+                    // Register for background sync if available
+                    if ('SyncManager' in window) {
+                        // Register for background sync
+                        document.addEventListener('DOMContentLoaded', () => {
+                            registration.sync.register('sync-citations')
+                                .catch(err => console.log('Background sync registration failed:', err));
+                        });
+                    }
+                    
+                    // Handle service worker updates
+                    let refreshing = false;
+                    navigator.serviceWorker.addEventListener('controllerchange', () => {
+                        if (!refreshing) {
+                            refreshing = true;
+                            window.location.reload();
+                        }
+                    });
+                } catch (error) {
+                    console.error('Service Worker registration failed:', error);
+                    // Create an offline indicator to show app is in offline-only mode
+                    document.addEventListener('DOMContentLoaded', () => {
+                        // Only create if it doesn't exist yet
+                        if (!document.getElementById('offline-indicator')) {
+                            const offlineNotice = document.createElement('div');
+                            offlineNotice.id = 'offline-indicator';
+                            offlineNotice.textContent = 'Додаток працює в режимі без кешування. Деякі функції можуть бути недоступні в офлайн режимі.';
+                            offlineNotice.style.background = '#fff3cd';
+                            offlineNotice.style.color = '#856404';
+                            offlineNotice.style.padding = '0.5rem';
+                            offlineNotice.style.textAlign = 'center';
+                            offlineNotice.style.fontSize = '0.9rem';
+                            
+                            // Add to the top of the page
+                            const container = document.querySelector('.container');
+                            if (container) {
+                                container.insertBefore(offlineNotice, container.firstChild);
+                            }
+                        }
+                    });
+                }
+            });
+        } else {
+            // Service workers not supported at all - no offline capability
+            document.addEventListener('DOMContentLoaded', () => {
+                const offlineNotice = document.createElement('div');
+                offlineNotice.id = 'offline-indicator';
+                offlineNotice.textContent = 'Ваш браузер не підтримує офлайн режим. Додаток потребує інтернет-з\'єднання для роботи.';
+                offlineNotice.style.background = '#fff3cd';
+                offlineNotice.style.color = '#856404';
+                offlineNotice.style.padding = '0.5rem';
+                offlineNotice.style.textAlign = 'center';
+                offlineNotice.style.fontSize = '0.9rem';
+                
+                // Add to the top of the page
+                const container = document.querySelector('.container');
+                if (container) {
+                    container.insertBefore(offlineNotice, container.firstChild);
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <main class="container">
+        <h1>
+            <svg style="height: 2em; width: auto; color: currentColor;" width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" fill="currentColor"/>
+                <path d="M14 17H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" fill="currentColor"/>
+            </svg>
+            Конвертер стилів форматування
+        </h1>
+        
+        <!-- Toast notifications region -->
+        <div id="notifications-region" role="region" aria-label="Сповіщення" aria-live="polite"></div>
+        
+        <section class="input-section">
+            <h2>
+                <span class="material-icons">edit</span>
+                Введіть бібліографічні дані
+            </h2>
+            <form id="citationForm" class="card form">
+                <div class="style-options">
+                    <label class="style-option">
+                        <input type="checkbox" name="styles" value="dstu" checked>
+                        <span>ДСТУ 8302:2015</span>
+                    </label>
+                    <label class="style-option">
+                        <input type="checkbox" name="styles" value="apa" checked>
+                        <span>APA</span>
+                    </label>
+                    <label class="style-option">
+                        <input type="checkbox" name="styles" value="ieee" checked>
+                        <span>IEEE</span>
+                    </label>
+                </div>
+                
+                <div class="source-type-selector">
+                    <h3>Тип джерела:</h3>
+                    <div class="source-options">
+                        <label class="source-option">
+                            <input type="radio" name="sourceType" value="article" checked>
+                            <span class="material-icons">article</span>
+                            <span>Стаття</span>
+                        </label>
+                        <label class="source-option">
+                            <input type="radio" name="sourceType" value="book">
+                            <span class="material-icons">auto_stories</span>
+                            <span>Книга</span>
+                        </label>
+                        <label class="source-option">
+                            <input type="radio" name="sourceType" value="conference">
+                            <span class="material-icons">groups</span>
+                            <span>Конференція</span>
+                        </label>
+                        <label class="source-option">
+                            <input type="radio" name="sourceType" value="webpage">
+                            <span class="material-icons">language</span>
+                            <span>Веб-сторінка</span>
+                        </label>
+                        <label class="source-option">
+                            <input type="radio" name="sourceType" value="thesis">
+                            <span class="material-icons">school</span>
+                            <span>Дисертація</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="field" data-initial="true" data-required="true">
+                    <label for="authors" class="required">
+                        <span class="material-icons">people</span>
+                        Автори
+                    </label>
+                    <input id="authors" name="authors" placeholder="Моторний Д.К." required>
+                    <p class="description">Вкажіть прізвище та ініціали кожного автора, розділяючи їх крапкою з комою (;)</p>
+                </div>
+                <div class="field" data-initial="true" data-required="true">
+                    <label for="title" class="required">
+                        <span class="material-icons">title</span>
+                        Назва
+                    </label>
+                    <input id="title" name="title" placeholder="Повна назва публікації" required>
+                    <p class="description">Вкажіть повну назву публікації без скорочень</p>
+                </div>
+                <div class="field" data-initial="true" data-required="true">
+                    <label for="year" class="required">
+                        <span class="material-icons">calendar_today</span>
+                        Рік
+                    </label>
+                    <input id="year" name="year" type="number" min="1900" max="2030" placeholder="2025" required>
+                    <p class="description">Рік публікації або видання</p>
+                </div>
+                <div class="field" data-initial="true" data-required="true">
+                    <label for="doi" class="required">
+                        <span class="material-icons">link</span>
+                        DOI
+                    </label>
+                    <input id="doi" name="doi" pattern="^(?:(?:https?:\/\/)?(?:dx\.)?doi\.org\/)?10\.\d{4,}\/[-._;()/:\w]+$" 
+                           placeholder="10.1234/abcd або https://doi.org/10.1234/abcd"
+                           title="Формат: 10.xxxx/xxxxx або https://doi.org/10.xxxx/xxxxx">
+                    <p class="description">Цифровий ідентифікатор об'єкта (можна вказати у форматі 10.xxxx/xxxxx або повне посилання)</p>
+                </div>
+                <div class="field" id="pagesGroup" data-source-type="article,book,conference">
+                    <label for="pages">
+                        <span class="material-icons">menu_book</span>
+                        Сторінки
+                    </label>
+                    <input id="pages" name="pages" pattern="\d+(?:-\d+)?" placeholder="123-145 або 42">
+                    <p class="description">Діапазон сторінок (наприклад, 123-145) або окрема сторінка (наприклад, 42)</p>
+                </div>
+                <div class="field" id="publisherGroup" data-source-type="book,conference">
+                    <label for="publisher" class="required">
+                        <span class="material-icons">business</span>
+                        Видавництво
+                    </label>
+                    <input id="publisher" name="publisher" placeholder="Наукова думка">
+                    <p class="description">Назва видавництва, що опублікувало книгу</p>
+                </div>
+                <div class="field" id="locationGroup" data-source-type="book,conference">
+                    <label for="location" class="required">
+                        <span class="material-icons">location_on</span>
+                        Місце видання
+                    </label>
+                    <input id="location" name="location" placeholder="Київ">
+                    <p class="description">Місто, де було опубліковано книгу</p>
+                </div>
+                <div class="field" id="volumeGroup" data-source-type="article,book">
+                    <label for="volume">
+                        <span class="material-icons">collections_bookmark</span>
+                        Том
+                    </label>
+                    <input id="volume" name="volume" type="number" placeholder="13">
+                    <p class="description">Номер тому для багатотомних видань</p>
+                </div>
+                <div class="field" id="issueGroup" data-source-type="article,conference">
+                    <label for="issue">
+                        <span class="material-icons">bookmark</span>
+                        Номер
+                    </label>
+                    <input id="issue" name="issue" type="number" placeholder="7">
+                    <p class="description">Номер випуску журналу або збірника</p>
+                </div>
+                
+                <!-- Source-specific fields -->
+                <div class="field" id="journalGroup" data-source-type="article">
+                    <label for="journal" class="required">
+                        <span class="material-icons">description</span>
+                        Назва журналу
+                    </label>
+                    <input id="journal" name="journal" placeholder="Вісник аграрної науки">
+                    <p class="description">Повна назва наукового журналу без скорочень</p>
+                </div>
+                
+                <div class="field" id="conferenceNameGroup" data-source-type="conference">
+                    <label for="conferenceName">
+                        <span class="material-icons">event</span>
+                        Назва конференції
+                    </label>
+                    <input id="conferenceName" name="conferenceName" placeholder="Міжнародна наукова конференція">
+                    <p class="description">Повна офіційна назва конференції або симпозіуму</p>
+                </div>
+                
+                <div class="field" id="urlGroup" data-source-type="webpage,article,conference">
+                    <label for="url">
+                        <span class="material-icons">link</span>
+                        URL
+                    </label>
+                    <input id="url" name="url" type="url" placeholder="https://example.com/article">
+                    <p class="description">Повна вебадреса сторінки (включно з https://)</p>
+                </div>
+                
+                <div class="field" id="accessDateGroup" data-source-type="webpage">
+                    <label for="accessDate">
+                        <span class="material-icons">today</span>
+                        Дата доступу
+                    </label>
+                    <input id="accessDate" name="accessDate" type="date" placeholder="2025-05-15">
+                    <p class="description">Дата, коли ви переглядали або отримали доступ до вебсторінки</p>
+                </div>
+                
+                <div class="field" id="institutionGroup" data-source-type="thesis">
+                    <label for="institution">
+                        <span class="material-icons">account_balance</span>
+                        Заклад
+                    </label>
+                    <input id="institution" name="institution" placeholder="Таврійський агротехнологічний університет">
+                    <p class="description">Повна назва університету або наукової установи</p>
+                </div>
+                
+                <div class="field" id="thesisTypeGroup" data-source-type="thesis">
+                    <label for="thesisType">
+                        <span class="material-icons">school</span>
+                        Тип роботи
+                    </label>
+                    <select id="thesisType" name="thesisType">
+                        <option value="PhD">Дисертація доктора філософії</option>
+                        <option value="masters">Магістерська робота</option>
+                        <option value="bachelors">Бакалаврська робота</option>
+                        <option value="doctoral">Докторська дисертація</option>
+                    </select>
+                    <p class="description">Тип наукової роботи або дисертації</p>
+                </div>
+                
+                <div class="field" id="editionGroup" data-source-type="book">
+                    <label for="edition">
+                        <span class="material-icons">format_list_numbered</span>
+                        Видання
+                    </label>
+                    <input id="edition" name="edition" type="number" placeholder="2">
+                    <p class="description">Номер видання книги (якщо не перше)</p>
+                </div>
+                
+                <div class="field" id="isbnGroup" data-source-type="book">
+                    <label for="isbn">
+                        <span class="material-icons">vpn_key</span>
+                        ISBN
+                    </label>
+                    <input id="isbn" name="isbn" placeholder="978-3-16-148410-0" 
+                           pattern="^(?:ISBN(?:-1[03])?:? )?(?=[-0-9 ]{17}$|[-0-9X ]{13}$|[0-9X]{10}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]$">
+                    <p class="description">Міжнародний стандартний номер книги (ISBN)</p>
+                </div>
+                
+                <div class="field" id="conferenceLocationGroup" data-source-type="conference">
+                    <label for="conferenceLocation">
+                        <span class="material-icons">place</span>
+                        Місце проведення
+                    </label>
+                    <input id="conferenceLocation" name="conferenceLocation" placeholder="Мелітополь, Україна">
+                    <p class="description">Місто та країна, де проводилась конференція</p>
+                </div>
+                
+                <div class="field" id="conferenceDateGroup" data-source-type="conference">
+                    <label for="conferenceDate">
+                        <span class="material-icons">event_available</span>
+                        Дата проведення
+                    </label>
+                    <input id="conferenceDate" name="conferenceDate" type="text" placeholder="15-17 травня 2025">
+                    <p class="description">Дати проведення конференції</p>
+                </div>
+                
+                <div class="field" id="issnGroup" data-source-type="article">
+                    <label for="issn">
+                        <span class="material-icons">confirmation_number</span>
+                        ISSN
+                    </label>
+                    <input id="issn" name="issn" placeholder="1234-5678" pattern="^\d{4}-\d{3}[\dX]$">
+                    <p class="description">Міжнародний стандартний номер серіального видання</p>
+                </div>
+                
+                <div class="field" id="languageGroup" data-source-type="article,book,conference,thesis">
+                    <label for="language">
+                        <span class="material-icons">language</span>
+                        Мова публікації
+                    </label>
+                    <select id="language" name="language">
+                        <option value="uk">Українська</option>
+                        <option value="en">Англійська</option>
+                        <option value="ru">Російська</option>
+                        <option value="de">Німецька</option>
+                        <option value="fr">Французька</option>
+                        <option value="other">Інша</option>
+                    </select>
+                    <p class="description">Мова, якою написано публікацію</p>
+                </div>
+                
+                <div class="submit-wrapper">
+                    <button type="button" id="submitButton" class="submit">
+                        <span class="material-icons">format_quote</span>
+                        <span>Створити бібліографічний опис</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+        <section class="output-section">
+            <h2>
+                <span class="material-icons">auto_awesome</span>
+                Готові бібліографічні посилання
+            </h2>
+            <div class="results">
+                <article id="dstuOutput" class="card output">
+                    <h3>ДСТУ 8302:2015</h3>
+                    <div class="result">
+                        <p id="dstuResult" class="wrap"></p>
+                    </div>
+                    <div class="actions">
+                        <button class="action-btn" data-style="dstu">
+                            <span class="material-icons">share</span>
+                            <span>Поділитися</span>
+                        </button>
+                        <button class="action-btn" data-style="dstu">
+                            <span class="material-icons">content_copy</span>
+                            <span>Копіювати</span>
+                        </button>
+                        <button class="action-btn" data-style="dstu">
+                            <span class="material-icons">print</span>
+                            <span>Друкувати</span>
+                        </button>
+                    </div>
+                </article>
+                <article id="apaOutput" class="card output">
+                    <h3>APA</h3>
+                    <div class="result">
+                        <p id="apaResult" class="wrap"></p>
+                    </div>
+                    <div class="actions">
+                        <button class="action-btn" data-style="apa">
+                            <span class="material-icons">share</span>
+                            <span>Поділитися</span>
+                        </button>
+                        <button class="action-btn" data-style="apa">
+                            <span class="material-icons">content_copy</span>
+                            <span>Копіювати</span>
+                        </button>
+                        <button class="action-btn" data-style="apa">
+                            <span class="material-icons">print</span>
+                            <span>Друкувати</span>
+                        </button>
+                    </div>
+                </article>
+                <article id="ieeeOutput" class="card output">
+                    <h3>IEEE</h3>
+                    <div class="result">
+                        <p id="ieeeResult" class="wrap"></p>
+                    </div>
+                    <div class="actions">
+                        <button class="action-btn" data-style="ieee">
+                            <span class="material-icons">share</span>
+                            <span>Поділитися</span>
+                        </button>
+                        <button class="action-btn" data-style="ieee">
+                            <span class="material-icons">content_copy</span>
+                            <span>Копіювати</span>
+                        </button>
+                        <button class="action-btn" data-style="ieee">
+                            <span class="material-icons">print</span>
+                            <span>Друкувати</span>
+                        </button>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+    <script src="js/utils.js" type="module"></script>
+    <script src="js/formatters.js" type="module"></script>
+    <script src="js/dataStorage.js" type="module"></script>
+    <script src="js/fieldManager.js" type="module"></script>
+    <script src="js/paginationManager.js" type="module"></script>
+    <script src="js/uiManager.js" type="module"></script>
+    <script src="js/formHandler.js" type="module"></script>
+    <script src="js/main.js" type="module"></script>
+</body>
+</html>
