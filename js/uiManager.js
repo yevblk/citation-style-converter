@@ -126,7 +126,7 @@ function createShareModal(citationText, styleName) {
     
     // Create sharing options for common platforms
     const shareOptions = [
-        { name: 'Електронна пошта', url: `mailto:?subject=Бібліографічний опис у стилі ${styleName}&body=${shareText}`, icon: 'email' },
+        { name: 'Email', url: `mailto:?subject=Bibliographic citation in ${styleName} style&body=${shareText}`, icon: 'email' },
         { name: 'Twitter', url: `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`, icon: 'twitter' }
     ];
     
@@ -147,7 +147,7 @@ function createShareModal(citationText, styleName) {
     
     // Add header
     const header = document.createElement('h3');
-    header.textContent = 'Поділитися бібліографічним описом';
+    header.textContent = 'Share bibliographic citation';
     header.style.marginBottom = 'var(--spacing)';
     shareModal.appendChild(header);
     
@@ -201,7 +201,7 @@ function createShareModal(citationText, styleName) {
     
     // Add close button
     const closeButton = document.createElement('button');
-    closeButton.textContent = 'Закрити';
+    closeButton.textContent = 'Close';
     closeButton.className = 'action-btn';
     closeButton.style.marginTop = 'var(--spacing)';
     closeButton.style.width = '100%';
@@ -247,17 +247,17 @@ function createShareModal(citationText, styleName) {
 function createPrintWindow(citationText, styleName) {
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
-        throw new Error('Не вдалося відкрити вікно друку. Перевірте налаштування блокування спливаючих вікон у вашому браузері.');
+        throw new Error('Failed to open print window. Please check your browser\'s popup blocker settings.');
     }
     
     // Create a clean, print-friendly document
     printWindow.document.write(`
         <!DOCTYPE html>
-        <html lang="uk">
+        <html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Бібліографічний опис у стилі ${styleName}</title>
+            <title>Bibliographic citation in ${styleName} style</title>
             <style>
                 body {
                     font-family: 'Times New Roman', Times, serif;
@@ -295,8 +295,8 @@ function createPrintWindow(citationText, styleName) {
         </head>
         <body>
             <div class="header">
-                <h1>Бібліографічний опис у стилі ${styleName}</h1>
-                <p>Дата створення: ${new Date().toLocaleDateString('uk-UA', {
+                <h1>Bibliographic citation in ${styleName} style</h1>
+                <p>Date created: ${new Date().toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
@@ -304,7 +304,7 @@ function createPrintWindow(citationText, styleName) {
             </div>
             <div class="citation">${citationText}</div>
             <div class="footer">
-                Створено за допомогою Конвертера стилів форматування бібліографічних посилань ТДАТУ<br>
+                Created with the TSATU Bibliographic Citation Style Converter<br>
                 <a href="https://t.me/tsatu_citations_bot/app">t.me/tsatu_citations_bot</a>
             </div>
         </body>

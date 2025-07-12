@@ -25,40 +25,40 @@ const formatters = {
                     } else if (data.volume) {
                         elements.push(`${data.volume}`);
                     } else if (data.issue) {
-                        elements.push(`№ ${data.issue}`);
+                        elements.push(`No. ${data.issue}`);
                     }
                     break;
                     
                 case 'book':
-                    if (data.volume) elements.push(`Т. ${data.volume}`);
+                    if (data.volume) elements.push(`Vol. ${data.volume}`);
                     break;
                     
                 case 'conference':
-                    if (data.conferenceName) elements.push(`Матеріали конференції "${data.conferenceName}"`);
+                    if (data.conferenceName) elements.push(`Conference proceedings "${data.conferenceName}"`);
                     break;
                     
                 case 'webpage':
-                    elements.push('[Електронний ресурс]');
+                    elements.push('[Electronic resource]');
                     if (data.url) elements.push(`URL: ${data.url}`);
                     if (data.accessDate) {
                         const date = new Date(data.accessDate);
-                        const formattedDate = date.toLocaleDateString('uk-UA', {
+                        const formattedDate = date.toLocaleDateString('en-GB', {
                             day: '2-digit',
                             month: '2-digit',
                             year: 'numeric'
                         });
-                        elements.push(`дата звернення: ${formattedDate}`);
+                        elements.push(`access date: ${formattedDate}`);
                     }
                     break;
                     
                 case 'thesis':
                     const thesisTypeMap = {
-                        'PhD': 'дис. ... доктора філософії',
-                        'masters': 'магістерська робота',
-                        'bachelors': 'бакалаврська робота',
-                        'doctoral': 'дис. ... докт. наук'
+                        'PhD': 'PhD thesis',
+                        'masters': "Master's thesis",
+                        'bachelors': "Bachelor's thesis",
+                        'doctoral': 'Doctoral thesis'
                     };
-                    elements.push(thesisTypeMap[data.thesisType] || 'дисертація');
+                    elements.push(thesisTypeMap[data.thesisType] || 'Thesis');
                     if (data.institution) elements.push(data.institution);
                     break;
             }
@@ -71,7 +71,7 @@ const formatters = {
             }
             
             elements.push(data.year);
-            if (data.pages) elements.push(`С. ${data.pages}`);
+            if (data.pages) elements.push(`P. ${data.pages}`);
             if (data.doi) elements.push(`DOI: ${data.doi}`);
             
             return elements.filter(Boolean).join('. ');
@@ -244,9 +244,9 @@ export function formatCitations(data) {
         if (!data.authors || !data.title || !data.year) {
             // Return fallback formatting
             return {
-                dstu: `${data.authors || 'Автор не вказаний'}. ${data.title || 'Назва не вказана'}. ${data.year || 'Рік не вказаний'}.`,
-                apa: `${data.authors || 'Автор не вказаний'} (${data.year || 'n.d.'}). ${data.title || 'Назва не вказана'}.`,
-                ieee: `${data.authors || 'Автор не вказаний'}, "${data.title || 'Назва не вказана'}", ${data.year || 'n.d.'}.`
+                dstu: `${data.authors || 'Author not specified'}. ${data.title || 'Title not specified'}. ${data.year || 'Year not specified'}.`,
+                apa: `${data.authors || 'Author not specified'} (${data.year || 'n.d.'}). ${data.title || 'Title not specified'}.`,
+                ieee: `${data.authors || 'Author not specified'}, "${data.title || 'Title not specified'}", ${data.year || 'n.d.'}.`
             };
         }
         
@@ -268,9 +268,9 @@ export function formatCitations(data) {
     } catch (error) {
         // Return fallback formatting
         return {
-            dstu: `${data.authors || 'Автор не вказаний'}. ${data.title || 'Назва не вказана'}. ${data.year || 'Рік не вказаний'}.`,
-            apa: `${data.authors || 'Автор не вказаний'} (${data.year || 'n.d.'}). ${data.title || 'Назва не вказана'}.`,
-            ieee: `${data.authors || 'Автор не вказаний'}, "${data.title || 'Назва не вказана'}", ${data.year || 'n.d.'}.`
+            dstu: `${data.authors || 'Author not specified'}. ${data.title || 'Title not specified'}. ${data.year || 'Year not specified'}.`,
+            apa: `${data.authors || 'Author not specified'} (${data.year || 'n.d.'}). ${data.title || 'Title not specified'}.`,
+            ieee: `${data.authors || 'Author not specified'}, "${data.title || 'Title not specified'}", ${data.year || 'n.d.'}.`
         };
     }
 }

@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const welcomeShown = localStorage.getItem('welcomeMessageShown');
         if (!welcomeShown) {
             setTimeout(() => {
-                showToast('Вітаємо у Конвертері стилів форматування бібліографічних посилань! Заповніть форму, щоб створити бібліографічний опис.', 'info');
+                showToast('Welcome to the Bibliographic Citation Style Converter! Fill out the form to create a bibliographic entry.', 'info');
                 localStorage.setItem('welcomeMessageShown', 'true');
             }, 1000);
         }
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Quick way to reset everything when things go haywire during testing
     window.resetAppPreferences = function() {
         localStorage.removeItem('welcomeMessageShown');
-        console.log('Налаштування програми скинуто. Оновіть сторінку, щоб побачити вітальне повідомлення знову.');
+        console.log('App preferences have been reset. Reload the page to see the welcome message again.');
     };
 
     // Save user's work while they type - nobody likes losing their stuff
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const savedData = loadFormData();
             if (savedData) {
                 restoreFormData(savedData);
-                showToast('Дані форми відновлено з вашої останньої сесії', 'info');
+                showToast('Form data restored from your last session', 'info');
             }
             
             // Grab any citations they've already created
@@ -338,11 +338,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Copy button
         const copyBtn = document.createElement('button');
         copyBtn.className = 'copy-btn';
-        copyBtn.innerHTML = '<span class="material-icons">content_copy</span> Копіювати';
+        copyBtn.innerHTML = '<span class="material-icons">content_copy</span> Copy';
         copyBtn.addEventListener('click', () => {
             const text = citationText.textContent;
             copyToClipboard(text);
-            showToast('Опис скопійовано до буфера обміну', 'success');
+            showToast('Citation copied to clipboard', 'success');
         });
         
         // Add elements to container
@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Get full style name from style code
     function getStyleFullName(styleCode) {
         const styleNames = {
-            'dstu': 'ДСТУ 8302:2015',
+            'dstu': 'DSTU 8302:2015',
             'apa': 'APA Style',
             'ieee': 'IEEE Style',
             'harvard': 'Harvard Style',
@@ -387,19 +387,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const exportButton = document.createElement('button');
             exportButton.type = 'button';
             exportButton.className = 'btn export-btn';
-            exportButton.innerHTML = '<span class="material-icons">download</span> Експорт даних';
+            exportButton.innerHTML = '<span class="material-icons">download</span> Export Data';
             exportButton.addEventListener('click', handleDataExport);
             
             const importButton = document.createElement('button');
             importButton.type = 'button';
             importButton.className = 'btn import-btn';
-            importButton.innerHTML = '<span class="material-icons">upload</span> Імпорт даних';
+            importButton.innerHTML = '<span class="material-icons">upload</span> Import Data';
             importButton.addEventListener('click', handleDataImport);
             
             // Group everything together nicely
             const dataManagementDiv = document.createElement('div');
             dataManagementDiv.className = 'data-management-controls';
-            dataManagementDiv.appendChild(document.createElement('h3')).textContent = 'Керування даними';
+            dataManagementDiv.appendChild(document.createElement('h3')).textContent = 'Data Management';
             dataManagementDiv.appendChild(exportButton);
             dataManagementDiv.appendChild(importButton);
             
@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
         link.click();
         document.body.removeChild(link);
         
-        showToast('Дані успішно експортовано', 'success');
+        showToast('Data exported successfully', 'success');
     }
     
     // Let user upload their backup file
@@ -443,14 +443,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const success = importUserData(e.target.result);
                     if (success) {
-                        showToast('Дані успішно імпортовано. Сторінка перезавантажується...', 'success');
+                        showToast('Data imported successfully. The page will reload...', 'success');
                         setTimeout(() => window.location.reload(), 2000);
                     } else {
-                        showToast('Не вдалося імпортувати дані. Невірний формат.', 'error');
+                        showToast('Failed to import data. Invalid format.', 'error');
                     }
                 } catch (error) {
                     console.error('Error importing data:', error);
-                    showToast('Не вдалося імпортувати дані', 'error');
+                    showToast('Failed to import data', 'error');
                 }
             });
             
@@ -485,7 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle welcome message
     const welcomeShown = localStorage.getItem('welcomeMessageShown');
     if (!welcomeShown) {
-        showToast('Вітаємо! Ваші дані зберігаються локально у вашому браузері для конфіденційності. Додаток також працює офлайн!', 'info', 10000);
+        showToast('Welcome! Your data is stored locally in your browser for privacy. The app also works offline!', 'info', 10000);
         localStorage.setItem('welcomeMessageShown', 'true');
     }
     
@@ -511,7 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
             statusElement.classList.remove('visible');
         } else {
             statusElement.classList.add('visible');
-            showToast('Ви в офлайн режимі. Не хвилюйтеся, додаток продовжуватиме працювати!', 'info');
+            showToast('You are offline. Don\'t worry, the app will continue to work!', 'info');
         }
     }
     

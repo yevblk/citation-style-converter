@@ -57,7 +57,7 @@ export function showToast(message, type = 'info', duration = 3000) {
  * @param {string} text - The goods to copy
  * @param {string} successMessage - What to brag about when it works
  */
-export async function copyToClipboard(text, successMessage = 'Успішно скопійовано до буфера обміну!') {
+export async function copyToClipboard(text, successMessage = 'Successfully copied to clipboard!') {
     try {
         await navigator.clipboard.writeText(text);
         if (successMessage) {
@@ -67,7 +67,7 @@ export async function copyToClipboard(text, successMessage = 'Успішно с�
     } catch (error) {
         // Clipboard can be finicky sometimes
         console.error('Failed to copy:', error);
-        showToast('Не вдалося скопіювати текст. Перевірте дозволи браузера.', 'error');
+        showToast('Failed to copy text. Please check your browser permissions.', 'error');
         return false;
     }
 }
@@ -82,15 +82,15 @@ export function validateFormData(formData) {
     
     // Must-haves - can't live without these
     if (!data.authors || data.authors.trim() === '') {
-        return 'Будь ласка, вкажіть авторів публікації';
+        return 'Please specify the authors of the publication';
     }
     
     if (!data.title || data.title.trim() === '') {
-        return 'Будь ласка, вкажіть повну назву публікації';
+        return 'Please specify the full title of the publication';
     }
     
     if (!data.year) {
-        return 'Будь ласка, вкажіть рік публікації';
+        return 'Please specify the year of publication';
     }
     
     const yearNum = parseInt(data.year);
@@ -98,7 +98,7 @@ export function validateFormData(formData) {
     
     // No time travelers allowed
     if (isNaN(yearNum) || yearNum < 1800 || yearNum > currentYear + 5) {
-        return `Рік публікації має бути між 1800 та ${currentYear + 5}`;
+        return `The year of publication must be between 1800 and ${currentYear + 5}`;
     }
     
     // Different source types need different info
@@ -107,38 +107,38 @@ export function validateFormData(formData) {
     switch (sourceType) {
         case 'article':
             if (!data.journal || data.journal.trim() === '') {
-                return 'Для статті необхідно вказати назву наукового журналу';
+                return 'For an article, please specify the name of the scientific journal';
             }
             break;
             
         case 'book':
             if (!data.publisher || data.publisher.trim() === '') {
-                return 'Для книги необхідно вказати назву видавництва';
+                return 'For a book, please specify the name of the publisher';
             }
             break;
             
         case 'conference':
             if (!data.conferenceName || data.conferenceName.trim() === '') {
-                return 'Для матеріалів конференції необхідно вказати назву конференції';
+                return 'For conference materials, please specify the name of the conference';
             }
             break;
             
         case 'webpage':
             if (!data.url || data.url.trim() === '') {
-                return 'Для веб-сторінки необхідно вказати повну URL-адресу';
+                return 'For a webpage, please specify the full URL address';
             }
             
             // Make sure URL isn't going to break everything
             try {
                 new URL(data.url);
             } catch (e) {
-                return 'Невірний формат URL-адреси. Приклад правильного формату: https://example.com';
+                return 'Invalid URL format. Example of correct format: https://example.com';
             }
             break;
             
         case 'thesis':
             if (!data.institution || data.institution.trim() === '') {
-                return 'Для дисертації необхідно вказати назву наукової установи';
+                return 'For a thesis, please specify the name of the scientific institution';
             }
             break;
     }

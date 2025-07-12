@@ -5,7 +5,7 @@
 
 /**
  * Sprinkles those little navigation dots at the bottom of the page
- * You know, the ones that let you know where the heck you are
+ * You know, the ones that let you know where you are
  */
 function createPaginationDots() {
     // No need for this on big screens - dots are a mobile-only party
@@ -221,7 +221,7 @@ function switchToAdjacentStyle(direction) {
     // Show hint
     const styleName = visibleOutputs[nextIndex].querySelector('h3').textContent;
     if (typeof showToast === 'function') {
-        showToast(`Перехід до стилю: ${styleName}`, 'info', 1500);
+        showToast(`Switched to style: ${styleName}`, 'info', 1500);
     }
 }
 

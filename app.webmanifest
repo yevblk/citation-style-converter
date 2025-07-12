@@ -1,7 +1,7 @@
 {
-  "name": "Конвертер стилів форматування",
-  "short_name": "Конвертер стилів",
-  "description": "Конвертер стилів форматування бібліографічних посилань: ДСТУ 8302:2015, APA, IEEE.",
+  "name": "Citation Style Converter",
+  "short_name": "Style Converter",
+  "description": "Converter for bibliographic citation styles: DSTU 8302:2015, APA, IEEE.",
   "start_url": "/?source=pwa",
   "id": "/",
   "scope": "/",
@@ -38,15 +38,15 @@
     }
   ],
   "orientation": "any",
-  "lang": "uk",
+  "lang": "en",
   "dir": "ltr",
   "prefer_related_applications": false,
   "categories": ["utilities", "education", "productivity"],
   "shortcuts": [
     {
-      "name": "Новий запис",
-      "short_name": "Новий",
-      "description": "Створити новий бібліографічний запис",
+      "name": "New Entry",
+      "short_name": "New",
+      "description": "Create a new bibliographic entry",
       "url": "/?action=new",
       "icons": [{ "src": "icon-96x96.png", "sizes": "96x96" }]
     }

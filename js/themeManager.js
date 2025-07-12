@@ -16,13 +16,13 @@ const THEME_AUTO = 'auto';
  * Sets up the toggle button and loads whatever theme you picked last time
  */
 export function initThemeSystem() {
-    // Slap that theme toggle button onto the page
+    // Add the theme toggle button to the page
     createThemeToggle();
     
     // Figure out what theme to use (saved or system default)
     applyTheme(getSavedTheme());
     
-    // Keep an eye on system theme changes if we're in auto mode
+    // Listen for system theme changes if we're in auto mode
     if (window.matchMedia) {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
         
@@ -43,13 +43,13 @@ function createThemeToggle() {
     const themeToggle = document.createElement('div');
     themeToggle.className = 'theme-toggle';
     themeToggle.setAttribute('role', 'group');
-    themeToggle.setAttribute('aria-label', 'Перемикач теми');
+    themeToggle.setAttribute('aria-label', 'Theme switcher');
     
-    // Set up our three amigos - light, auto, and dark
+    // Set up our three options - light, auto, and dark
     const options = [
-        { value: THEME_LIGHT, icon: 'light_mode', label: 'Світла' },
-        { value: THEME_AUTO, icon: 'brightness_auto', label: 'Авто' },
-        { value: THEME_DARK, icon: 'dark_mode', label: 'Темна' }
+        { value: THEME_LIGHT, icon: 'light_mode', label: 'Light' },
+        { value: THEME_AUTO, icon: 'brightness_auto', label: 'Auto' },
+        { value: THEME_DARK, icon: 'dark_mode', label: 'Dark' }
     ];
     
     // What are we using right now?
@@ -78,11 +78,11 @@ function createThemeToggle() {
             
             // Let the user know we did something
             const themeLabels = {
-                'Світла': 'світлу',
-                'Авто': 'авто',
-                'Темна': 'темну'
+                'Light': 'light',
+                'Auto': 'auto',
+                'Dark': 'dark'
             };
-            showToast(`Тему змінено на ${themeLabels[option.label]}`, 'success');
+            showToast(`Theme changed to ${themeLabels[option.label]}`, 'success');
         });
         
         themeToggle.appendChild(button);

@@ -27,7 +27,7 @@ function initFormSubmission(citationForm, resultElements, styleCheckboxes, outpu
         const selectedStyles = [...styleCheckboxes].filter(checkbox => checkbox.checked);
         
         if (selectedStyles.length === 0) {
-            showToast('Будь ласка, оберіть хоча б один стиль форматування бібліографічного опису', 'error');
+            showToast('Please select at least one citation style', 'error');
             return;
         }
         
@@ -38,7 +38,7 @@ function initFormSubmission(citationForm, resultElements, styleCheckboxes, outpu
         // Check DOI format if provided
         const doiField = document.getElementById('doi');
         if (doiField && doiField.value && !doiField.validity.valid) {
-            showToast('DOI має неправильний формат. Використовуйте формат 10.xxxx/xxxxx або https://doi.org/10.xxxx/xxxxx', 'error');
+            showToast('DOI has an invalid format. Use 10.xxxx/xxxxx or https://doi.org/10.xxxx/xxxxx', 'error');
             doiField.focus();
             return;
         }
@@ -56,7 +56,7 @@ function initFormSubmission(citationForm, resultElements, styleCheckboxes, outpu
                 button.disabled = true;
                 button.innerHTML = `
                     <span class="material-icons loading-spinner">sync</span>
-                    <span>Створення бібліографічного опису...</span>
+                    <span>Generating citation...</span>
                 `;
             });
             
@@ -112,15 +112,15 @@ function initFormSubmission(citationForm, resultElements, styleCheckboxes, outpu
             }
             
         } catch (error) {
-            console.error('Помилка при створенні бібліографічного опису:', error);
-            showToast('Щось пішло не так при створенні бібліографічного опису. Спробуйте знову.', 'error');
+            console.error('Error generating citation:', error);
+            showToast('Something went wrong while generating the citation. Please try again.', 'error');
         } finally {
             // Put the buttons back to normal
             allSubmitButtons.forEach(button => {
                 button.disabled = false;
                 button.innerHTML = `
                     <span class="material-icons">check_circle</span>
-                    <span>Створити опис</span>
+                    <span>Generate citation</span>
                 `;
             });
         }
@@ -147,7 +147,7 @@ function initActionButtons(actionButtons, resultElements) {
                 const citationText = element.textContent;
                 
                 if (!citationText || citationText.trim() === '') {
-                    showToast('Немає тексту для копіювання. Спочатку створіть опис.', 'error');
+                    showToast('No text to copy. Please generate a citation first.', 'error');
                     return;
                 }
                 
@@ -170,7 +170,7 @@ function initActionButtons(actionButtons, resultElements) {
                 const citationText = element.textContent;
                 
                 if (!citationText || citationText.trim() === '') {
-                    showToast('Немає тексту для друку. Спочатку створіть опис.', 'error');
+                    showToast('No text to print. Please generate a citation first.', 'error');
                     return;
                 }
                 
@@ -194,7 +194,7 @@ function initActionButtons(actionButtons, resultElements) {
                 const citationText = element.textContent;
                 
                 if (!citationText || citationText.trim() === '') {
-                    showToast('Немає тексту для поширення. Спочатку створіть опис.', 'error');
+                    showToast('No text to share. Please generate a citation first.', 'error');
                     return;
                 }
                 
@@ -215,11 +215,11 @@ async function handleShare(citationText, style) {
         if (navigator.share) {
             // Use native sharing if available (mostly on mobile)
             await navigator.share({
-                title: `Бібліографічний опис (${style})`,
+                title: `Citation (${style})`,
                 text: citationText
             });
             
-            showToast('Опис успішно надіслано!', 'success');
+            showToast('Citation shared successfully!', 'success');
         } else {
             // Fall back to a custom share modal on desktops
             createShareModal(citationText, style);
@@ -227,8 +227,8 @@ async function handleShare(citationText, style) {
     } catch (error) {
         // Only show error if it's not just the user canceling
         if (error.name !== 'AbortError') {
-            console.error('Помилка при спробі поширення:', error);
-            showToast('Не вдалося поширити опис. Спробуйте скопіювати та поширити вручну.', 'error');
+            console.error('Error while trying to share:', error);
+            showToast('Could not share the citation. Please copy and share it manually.', 'error');
         }
     }
 }
@@ -241,8 +241,8 @@ async function handleCopy(citationText) {
     try {
         await copyToClipboard(citationText);
     } catch (error) {
-        console.error('Помилка при копіюванні:', error);
-        showToast('Не вдалося скопіювати текст. Спробуйте виділити та скопіювати вручну.', 'error');
+        console.error('Error copying:', error);
+        showToast('Could not copy the text. Please select and copy it manually.', 'error');
     }
 }
 
@@ -255,8 +255,8 @@ function handlePrint(citationText, style) {
     try {
         createPrintWindow(citationText, style);
     } catch (error) {
-        console.error('Помилка при підготовці до друку:', error);
-        showToast('Не вдалося відкрити вікно друку. Спробуйте скопіювати та роздрукувати з текстового редактора.', 'error');
+        console.error('Error preparing for print:', error);
+        showToast('Could not open the print window. Please copy and print from a text editor.', 'error');
     }
 }
 

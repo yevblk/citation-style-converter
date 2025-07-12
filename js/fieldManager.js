@@ -89,26 +89,26 @@ const fieldRequirements = {
 // Style descriptions for tooltips/help
 const styleDescriptions = {
     dstu: {
-        name: "ДСТУ 8302:2015",
-        description: "Український національний стандарт бібліографічного опису"
+        name: "DSTU 8302:2015",
+        description: "Ukrainian national standard for bibliographic description"
     },
     apa: {
         name: "APA (7th Edition)",
-        description: "Стиль Американської психологічної асоціації, широко використовується у соціальних науках"
+        description: "American Psychological Association style, widely used in social sciences"
     },
     ieee: {
         name: "IEEE",
-        description: "Стиль Інституту інженерів електротехніки та електроніки, використовується в технічних публікаціях"
+        description: "Institute of Electrical and Electronics Engineers style, used in technical publications"
     }
 };
 
 // Source type descriptions
 const sourceTypeDescriptions = {
-    article: "Наукова стаття в журналі або періодичному виданні",
-    book: "Книга, монографія або інше неперіодичне видання",
-    conference: "Матеріали конференції, тези доповіді або збірник наукових праць",
-    webpage: "Веб-сторінка, онлайн-ресурс або електронне джерело",
-    thesis: "Дисертація, автореферат або інша кваліфікаційна наукова робота"
+    article: "Scientific article in a journal or periodical",
+    book: "Book, monograph, or other non-periodical publication",
+    conference: "Conference proceedings, abstracts, or collection of scientific works",
+    webpage: "Web page, online resource, or electronic source",
+    thesis: "Thesis, dissertation, or other qualification research work"
 };
 
 /**
@@ -151,7 +151,7 @@ function updateFieldVisibility(styleCheckboxes, outputContainers, showToast) {
         
     // If no styles selected, show a message and return
     if (selectedStyles.length === 0 && showToast) {
-        showToast('Будь ласка, оберіть хоча б один стиль форматування бібліографічного опису', 'info');
+        showToast('Please select at least one citation style', 'info');
         return;
     }
     
@@ -269,7 +269,7 @@ function updateFieldVisibility(styleCheckboxes, outputContainers, showToast) {
                 .map(style => styleDescriptions[style].name)
                 .join(', ');
                 
-            fieldContainer.title = `Це поле обов'язкове для стилів: ${requiredByStyles}`;
+            fieldContainer.title = `This field is required for styles: ${requiredByStyles}`;
             
             // Highlight field with a subtle style
             fieldContainer.classList.add('required-by-style');
@@ -299,24 +299,24 @@ function updateFieldVisibility(styleCheckboxes, outputContainers, showToast) {
     
     switch (selectedSourceType) {
         case 'article':
-            titleInput.placeholder = 'Назва статті';
-            titleDescription.textContent = 'Повна назва статті';
+            titleInput.placeholder = 'Article title';
+            titleDescription.textContent = 'Full article title';
             break;
         case 'book':
-            titleInput.placeholder = 'Назва книги';
-            titleDescription.textContent = 'Повна назва книги';
+            titleInput.placeholder = 'Book title';
+            titleDescription.textContent = 'Full book title';
             break;
         case 'conference':
-            titleInput.placeholder = 'Назва доповіді';
-            titleDescription.textContent = 'Повна назва доповіді';
+            titleInput.placeholder = 'Conference paper title';
+            titleDescription.textContent = 'Full conference paper title';
             break;
         case 'webpage':
-            titleInput.placeholder = 'Назва веб-сторінки';
-            titleDescription.textContent = 'Повна назва веб-сторінки';
+            titleInput.placeholder = 'Webpage title';
+            titleDescription.textContent = 'Full webpage title';
             break;
         case 'thesis':
-            titleInput.placeholder = 'Назва дисертації';
-            titleDescription.textContent = 'Повна назва дисертації';
+            titleInput.placeholder = 'Thesis title';
+            titleDescription.textContent = 'Full thesis title';
             break;
     }
     
@@ -343,19 +343,19 @@ function customizeThesisTypeDropdown() {
     // Add custom icons/styling to thesis types
     const thesisTypeOptions = {
         'PhD': {
-            label: 'Дисертація доктора філософії',
+            label: 'Doctor of Philosophy thesis',
             icon: 'school'
         },
         'masters': {
-            label: 'Магістерська робота',
+            label: "Master's thesis",
             icon: 'workspace_premium'
         },
         'bachelors': {
-            label: 'Бакалаврська робота',
+            label: "Bachelor's thesis",
             icon: 'assignment'
         },
         'doctoral': {
-            label: 'Докторська дисертація',
+            label: 'Doctoral dissertation',
             icon: 'psychology'
         }
     };
